@@ -455,53 +455,9 @@ public class ChatFrame extends JFrame {
 
 						String sender = dis.readUTF();
 						String message = dis.readUTF();
-
-						if (message.contains("@")) {
-							if (chatWindows.get(" ") != null) {
-								lbReceiver.setText(" ");
-								groupMessage(lbReceiver.getText(), message.substring(1), false);
-								Style messageStyle = messageDoc.getStyle("Message style");
-								try {
-
-									messageDoc.insertString(messageDoc.getLength(), sender + ": ", userStyleSend);
-									messageDoc.insertString(messageDoc.getLength(), message.substring(1) + "\n",
-											messageStyle);
-									txtMessage.setText("");
-								} catch (BadLocationException ex) {
-									Logger.getLogger(ChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-								}
-							} else {
-								JTextPane temp = new JTextPane();
-								temp.setFont(new Font("Arial", Font.PLAIN, 14));
-								temp.setEditable(false);
-								chatWindows.put(" ", temp);
-								lbReceiver.setText(" ");
-
-								groupMessage(lbReceiver.getText(), message.substring(1), false);
-								Style messageStyle = messageDoc.getStyle("Message style");
-								try {
-
-									messageDoc.insertString(messageDoc.getLength(), sender + ": ", userStyleSend);
-									messageDoc.insertString(messageDoc.getLength(), message.substring(1) + "\n",
-											messageStyle);
-									txtMessage.setText("");
-								} catch (BadLocationException ex) {
-									Logger.getLogger(ChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-								}
-							}
-
-						} else {
-
-							newMessage(sender, message, false);
-						}
+						newMessage(sender, message, false);
 					}
-					// else if (method.equals("Emoji")) {
 
-					// String sender = dis.readUTF();
-					// String emoji = dis.readUTF();
-
-					// newEmoji(sender, emoji, false);
-					// }
 					else if (method.equals("Online users")) {
 
 						String[] users = dis.readUTF().split(",");
