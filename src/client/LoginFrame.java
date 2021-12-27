@@ -12,6 +12,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -45,6 +46,13 @@ public class LoginFrame extends JFrame {
 	
 	private String username;
 	private JTextField targetPort;
+	private static final String TRUST_STORE_PATH = "truststore";
+	private static final String TRUST_STORE_PW = "123456";
+
+	static {
+		System.setProperty("javax.net.ssl.trustStore", TRUST_STORE_PATH);
+		System.setProperty("javax.net.ssl.trustStorePassword", TRUST_STORE_PW);
+	}
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -351,7 +359,9 @@ public class LoginFrame extends JFrame {
 			if (socket != null) {
 				socket.close();
 			}
-			socket = new Socket(host, Integer.parseInt(targetPort.getText().trim()));
+			SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+			socket = socketFactory.createSocket(host, Integer.parseInt(targetPort.getText().trim()));
+//			socket =  new Socket(host, Integer.parseInt(targetPort.getText().trim()));
 			System.out.println(Integer.parseInt(targetPort.getText()));
 			this.dis = new DataInputStream(socket.getInputStream());
 			this.dos = new DataOutputStream(socket.getOutputStream());

@@ -8,9 +8,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
 /**
  * 
@@ -20,11 +22,17 @@ import java.util.ArrayList;
 public class Server {
 	private Object lock;
 	
-	private ServerSocket s;
+	private SSLServerSocket s;
 	private Socket socket;
 	static ArrayList<Handler> clients = new ArrayList<Handler>();
 	private String dataFile = "accounts.txt";
+	private static final String KEY_STORE_PATH = "SSLStore";
+	private static final String KEY_STORE_PW = "123456";
 	
+	static {
+		System.setProperty("javax.net.ssl.keyStore", KEY_STORE_PATH);
+		System.setProperty("javax.net.ssl.keyStorePassword", KEY_STORE_PW);
+	}
 
 	private void loadAccounts() {
 		try {
@@ -65,8 +73,10 @@ public class Server {
 			lock = new Object();
 			
 			this.loadAccounts();
+			SSLServerSocketFactory socketServerFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+			s = (SSLServerSocket) socketServerFactory.createServerSocket(port);
 			
-			s = new ServerSocket(port);
+//			s = new ServerSocket(port);
 			
 			while (true) {				
 				socket = s.accept();

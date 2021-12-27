@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,7 +57,7 @@ public class ChatFrame extends JFrame {
 
 	private JTextPane chatWindow;
 
-	JButton btnSelectAll;
+	JButton btnSendAll;
 
 	JComboBox<String> onlineUsers = new JComboBox<String>();
 
@@ -77,53 +78,6 @@ public class ChatFrame extends JFrame {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
-	// private void newEmoji(String username, String emoji, Boolean isMyMessage) {
-
-	// StyledDocument doc;
-	// if (username.equals(this.username)) {
-	// doc = chatWindows.get(lbReceiver.getText()).getStyledDocument();
-	// } else {
-	// doc = chatWindows.get(username).getStyledDocument();
-	// }
-
-	// Style userStyle = doc.getStyle("User style");
-	// if (userStyle == null) {
-	// userStyle = doc.addStyle("User style", null);
-	// StyleConstants.setBold(userStyle, true);
-	// }
-
-	// if (isMyMessage == true) {
-	// StyleConstants.setForeground(userStyle, Color.red);
-	// } else {
-	// StyleConstants.setForeground(userStyle, Color.BLUE);
-	// }
-
-	// try {
-	// doc.insertString(doc.getLength(), username + ": ", userStyle);
-	// } catch (BadLocationException e) {
-	// }
-
-	// Style iconStyle = doc.getStyle("Icon style");
-	// if (iconStyle == null) {
-	// iconStyle = doc.addStyle("Icon style", null);
-	// }
-	// String emojiPath = emoji.substring(emoji.lastIndexOf("/icon"));
-	// StyleConstants.setIcon(iconStyle, new
-	// ImageIcon(getClass().getResource(emojiPath)));
-
-	// try {
-	// doc.insertString(doc.getLength(), "invisible text", iconStyle);
-	// } catch (BadLocationException e) {
-	// }
-
-	// try {
-	// doc.insertString(doc.getLength(), "\n", userStyle);
-	// } catch (BadLocationException e) {
-	// }
-
-	// autoScroll();
-	// }
 
 	private void newMessage(String username, String message, Boolean isMyMessage) {
 
@@ -240,29 +194,29 @@ public class ChatFrame extends JFrame {
 
 		chatPanel = new JScrollPane();
 		chatPanel.setFont(new Font("Cascadia Code", Font.PLAIN, 10));
-		chatPanel.setBounds(15, 75, 483, 307);
+		chatPanel.setBounds(15, 75, 457, 307);
 		chatPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		JPanel leftPanel = new JPanel();
-		leftPanel.setBounds(508, 75, 137, 307);
+		leftPanel.setBounds(482, 75, 163, 307);
 		leftPanel.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(240, 248, 255)));
 		leftPanel.setBackground(Color.LIGHT_GRAY);
 
-		btnSelectAll = new JButton("");
-		btnSelectAll.setBackground(Color.WHITE);
-		btnSelectAll.setBounds(508, 393, 59, 49);
+		btnSendAll = new JButton("");
+		btnSendAll.setBackground(Color.WHITE);
+		btnSendAll.setBounds(508, 393, 59, 49);
 		// btnSelectAll.setEnabled(false);
-		btnSelectAll
+		btnSendAll
 				.setIcon(new ImageIcon(ChatFrame.class.getResource("/icon/component/ChatFrame/024-discussion.png")));
-		btnSelectAll.setToolTipText("Send message to all ");
-		btnSelectAll.setFont(new Font("OCR A Extended", Font.PLAIN, 11));
+		btnSendAll.setToolTipText("Send message to all ");
+		btnSendAll.setFont(new Font("OCR A Extended", Font.PLAIN, 11));
 
-		btnSelectAll.addActionListener(new ActionListener() {
+		btnSendAll.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (txtMessage.getText().isEmpty()) {
-					JOptionPane.showMessageDialog(null, "You need to text something!");
+					JOptionPane.showMessageDialog(null, "Empty chatbox!");
 				} else {
 					lbReceiver.setText((String) onlineUsers.getSelectedItem());
 					int size = onlineUsers.getItemCount();
@@ -323,9 +277,10 @@ public class ChatFrame extends JFrame {
 		JLabel userImage_1 = new JLabel((Icon) null);
 
 		JLabel userImage = new JLabel(
-				new ImageIcon(ChatFrame.class.getResource("/icon/component/ChatFrame/santa-claus.png")));
+				new ImageIcon(ChatFrame.class.getResource("/icon/component/ChatFrame/businessman.png")));
 
 		JPanel panel = new JPanel();
+		panel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 		panel.setBackground(new Color(255, 239, 213));
 
 		JLabel lbUsername = new JLabel(this.username);
@@ -333,32 +288,33 @@ public class ChatFrame extends JFrame {
 		panel.add(lbUsername);
 
 		GroupLayout gl_leftPanel_1 = new GroupLayout(leftPanel_1);
-		gl_leftPanel_1.setHorizontalGroup(gl_leftPanel_1.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_leftPanel_1.createSequentialGroup()
-						.addComponent(userImage, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-						.addGroup(gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_leftPanel_1.createSequentialGroup()
-										.addPreferredGap(ComponentPlacement.RELATED, 500, Short.MAX_VALUE)
-										.addComponent(userImage_1).addGap(66))
-								.addGroup(gl_leftPanel_1.createSequentialGroup()
-										.addPreferredGap(ComponentPlacement.RELATED).addComponent(panel,
-												GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
-										.addContainerGap()))));
+		gl_leftPanel_1.setHorizontalGroup(gl_leftPanel_1.createParallelGroup(Alignment.TRAILING).addGroup(gl_leftPanel_1
+				.createSequentialGroup()
+				.addComponent(userImage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_leftPanel_1.createSequentialGroup()
+								.addPreferredGap(ComponentPlacement.RELATED, 496, Short.MAX_VALUE)
+								.addComponent(userImage_1).addGap(66))
+						.addGroup(gl_leftPanel_1.createSequentialGroup().addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 252, GroupLayout.PREFERRED_SIZE)
+								.addContainerGap()))));
 		gl_leftPanel_1
 				.setVerticalGroup(
 						gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
-								.addComponent(userImage, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-								.addGroup(gl_leftPanel_1.createSequentialGroup().addContainerGap()
+								.addComponent(userImage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE)
+				.addGroup(gl_leftPanel_1.createSequentialGroup()
+										.addContainerGap()
 										.addGroup(gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
 												.addComponent(panel, GroupLayout.PREFERRED_SIZE, 34,
 														GroupLayout.PREFERRED_SIZE)
 												.addComponent(userImage_1))
-										.addContainerGap(16, Short.MAX_VALUE)));
+										.addContainerGap(20, Short.MAX_VALUE)));
 		leftPanel_1.setLayout(gl_leftPanel_1);
 		JLabel lblNewLabel_1 = new JLabel("Active Users");
-		lblNewLabel_1.setBounds(19, 13, 87, 15);
-		lblNewLabel_1.setFont(new Font("PT Serif Caption", Font.BOLD, 11));
-		onlineUsers.setBounds(10, 40, 117, 21);
+		lblNewLabel_1.setBounds(19, 13, 99, 15);
+		lblNewLabel_1.setFont(new Font("Cascadia Code", Font.BOLD, 12));
+		onlineUsers.setBounds(10, 40, 143, 31);
 		onlineUsers.setBackground(new Color(245, 245, 220));
 		onlineUsers.setFont(new Font("PT Sans Caption", Font.PLAIN, 11));
 		onlineUsers.addItemListener(new ItemListener() {
@@ -421,7 +377,7 @@ public class ChatFrame extends JFrame {
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (txtMessage.getText().isEmpty()) {
-					JOptionPane.showMessageDialog(null, "You need to text something!");
+					JOptionPane.showMessageDialog(null, "Empty chatbox!");
 				} else {
 
 					try {
@@ -443,7 +399,7 @@ public class ChatFrame extends JFrame {
 		this.getRootPane().setDefaultButton(btnSend);
 		contentPane.setLayout(null);
 		contentPane.add(leftPanel_1);
-		contentPane.add(btnSelectAll);
+		contentPane.add(btnSendAll);
 		contentPane.add(txtMessage);
 		contentPane.add(btnSend);
 		contentPane.add(leftPanel);
@@ -568,7 +524,7 @@ public class ChatFrame extends JFrame {
 							if (chatting.equals(user)) {
 								isChattingOnline = true;
 							}
-							if (chatting.equals("All")) {
+							if (chatting.equals(" ")) {
 								isChattingOnline = true;
 							}
 						}
