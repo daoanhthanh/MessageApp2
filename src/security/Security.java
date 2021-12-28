@@ -18,7 +18,7 @@ public class Security {
    private static final String ALGORITHM = "AES";
 
    // encrypt
-   public String encrypt(String strToEncrypt, String secret) {
+   public static String encrypt(String strToEncrypt, String secret) {
       try {
          prepareSecreteKey(secret);
          Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -31,7 +31,7 @@ public class Security {
    }
 
    // decrypt
-   public String decrypt(String strToDecrypt, String secret) {
+   public static String decrypt(String strToDecrypt, String secret) {
       try {
          prepareSecreteKey(secret);
          Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -43,7 +43,7 @@ public class Security {
       return null;
    }
 
-   private void prepareSecreteKey(String myKey) {
+   private static void prepareSecreteKey(String myKey) {
       MessageDigest sha = null;
       try {
          key = myKey.getBytes(StandardCharsets.UTF_8);

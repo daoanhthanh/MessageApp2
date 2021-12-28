@@ -40,6 +40,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import security.Security;
+
 public class ChatFrame extends JFrame {
 
 	private static final long serialVersionUID = -8948951261632836065L;
@@ -117,7 +119,7 @@ public class ChatFrame extends JFrame {
 		}
 
 		try {
-			doc.insertString(doc.getLength(), message + "\n", messageStyle);
+			doc.insertString(doc.getLength(), Security.decrypt(message, SECRET) + "\n", messageStyle);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
@@ -444,7 +446,7 @@ public class ChatFrame extends JFrame {
 					if (!method.equals("Online users")) {
 
 						String sender = dis.readUTF();
-						String message = dis.readUTF();
+						String message = Security.encrypt(dis.readUTF(), SECRET);
 						newMessage(sender, message, false);
 					}
 
@@ -475,7 +477,7 @@ public class ChatFrame extends JFrame {
 							}
 						}
 
-						if (isChattingOnline == false) {
+						if (isChattingOnline) {
 							onlineUsers.setSelectedItem(" ");
 							JOptionPane.showMessageDialog(null,
 									chatting + " is offline!\nYou will be redirect to default chat window");
