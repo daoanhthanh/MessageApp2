@@ -23,7 +23,7 @@ public class Server {
 	private Object lock;
 	private final String SECRET = "234rf2d2%TT4";
 
-	private SSLServerSocket s;
+	private SSLServerSocket sslServerSocket;
 	private Socket socket;
 	static ArrayList<AccountManagement> clients = new ArrayList<AccountManagement>();
 	private String dataFile = "accounts.txt";
@@ -74,12 +74,12 @@ public class Server {
 
 			this.loadAccounts();
 			SSLServerSocketFactory socketServerFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			s = (SSLServerSocket) socketServerFactory.createServerSocket(port);
+			sslServerSocket = (SSLServerSocket) socketServerFactory.createServerSocket(port);
 
-			// s = new ServerSocket(port);
+			// sslServerSocket = new ServerSocket(port);
 
 			while (true) {
-				socket = s.accept();
+				socket = sslServerSocket.accept();
 
 				DataInputStream dis = new DataInputStream(socket.getInputStream());
 				DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
@@ -151,8 +151,8 @@ public class Server {
 		} catch (Exception ex) {
 			System.err.println(ex);
 		} finally {
-			if (s != null) {
-				s.close();
+			if (sslServerSocket != null) {
+				sslServerSocket.close();
 			}
 		}
 	}

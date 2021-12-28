@@ -479,8 +479,6 @@ public class ChatFrame extends JFrame {
 
 						if (isChattingOnline) {
 							onlineUsers.setSelectedItem(" ");
-							JOptionPane.showMessageDialog(null,
-									chatting + " is offline!\nYou will be redirect to default chat window");
 						} else {
 							onlineUsers.setSelectedItem(chatting);
 						}

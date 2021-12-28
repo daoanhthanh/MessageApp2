@@ -15,6 +15,10 @@ import client.ChatFrame;
 
 public class SendFile extends javax.swing.JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2386162260747921537L;
 	private Socket socket;
 	private DataInputStream dis;
 	private DataOutputStream dos;

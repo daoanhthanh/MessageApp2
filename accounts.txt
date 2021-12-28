@@ -8,4 +8,6 @@ Bui Van Ngoc,thanh
 tha,1234
 Nguyen Huu Bang,12345
 Tran Quang Thinh,12345
+thanh_da,thanh
+thinh_TQ,thanh
 
