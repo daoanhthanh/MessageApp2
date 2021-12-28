@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
@@ -71,6 +70,8 @@ public class ChatFrame extends JFrame {
 
 	Style userStyleSend;
 
+	private final String SECRET = "234rf2d2%TT4";
+
 	private void autoScroll() {
 		chatPanel.getVerticalScrollBar().setValue(chatPanel.getVerticalScrollBar().getMaximum());
 	}
@@ -96,7 +97,7 @@ public class ChatFrame extends JFrame {
 			StyleConstants.setBold(userStyle, true);
 		}
 
-		if (isMyMessage == true) {
+		if (isMyMessage) {
 			StyleConstants.setForeground(userStyle, Color.red);
 		} else {
 			StyleConstants.setForeground(userStyle, Color.BLUE);
@@ -105,6 +106,7 @@ public class ChatFrame extends JFrame {
 		try {
 			doc.insertString(doc.getLength(), username + ": ", userStyle);
 		} catch (BadLocationException e) {
+			e.printStackTrace();
 		}
 
 		Style messageStyle = doc.getStyle("Message style");
@@ -117,6 +119,7 @@ public class ChatFrame extends JFrame {
 		try {
 			doc.insertString(doc.getLength(), message + "\n", messageStyle);
 		} catch (BadLocationException e) {
+			e.printStackTrace();
 		}
 
 		autoScroll();
@@ -142,7 +145,7 @@ public class ChatFrame extends JFrame {
 			StyleConstants.setBold(userStyle, true);
 		}
 
-		if (isMyMessage == true) {
+		if (isMyMessage) {
 			StyleConstants.setForeground(userStyle, Color.red);
 		} else {
 			StyleConstants.setForeground(userStyle, Color.BLUE);
@@ -208,7 +211,6 @@ public class ChatFrame extends JFrame {
 		// btnSelectAll.setEnabled(false);
 		btnSendAll
 				.setIcon(new ImageIcon(ChatFrame.class.getResource("/icon/component/ChatFrame/024-discussion.png")));
-		btnSendAll.setToolTipText("Send message to all ");
 		btnSendAll.setFont(new Font("OCR A Extended", Font.PLAIN, 11));
 
 		btnSendAll.addActionListener(new ActionListener() {
@@ -223,9 +225,7 @@ public class ChatFrame extends JFrame {
 					for (int i = 0; i < size; i++) {
 						String member = onlineUsers.getItemAt(i);
 						try {
-							dos.writeUTF("Text");
 							dos.writeUTF(member);
-							dos.writeUTF("@" + txtMessage.getText());
 							dos.flush();
 						} catch (IOException e1) {
 							e1.printStackTrace();
@@ -303,7 +303,7 @@ public class ChatFrame extends JFrame {
 						gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
 								.addComponent(userImage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
 										Short.MAX_VALUE)
-				.addGroup(gl_leftPanel_1.createSequentialGroup()
+								.addGroup(gl_leftPanel_1.createSequentialGroup()
 										.addContainerGap()
 										.addGroup(gl_leftPanel_1.createParallelGroup(Alignment.LEADING)
 												.addComponent(panel, GroupLayout.PREFERRED_SIZE, 34,
@@ -366,11 +366,7 @@ public class ChatFrame extends JFrame {
 		txtMessage.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (txtMessage.getText().isEmpty() || lbReceiver.getText().isEmpty()) {
-					btnSend.setEnabled(false);
-				} else {
-					btnSend.setEnabled(true);
-				}
+				btnSend.setEnabled(!txtMessage.getText().isEmpty() || !lbReceiver.getText().isEmpty());
 			}
 		});
 
@@ -381,7 +377,6 @@ public class ChatFrame extends JFrame {
 				} else {
 
 					try {
-						dos.writeUTF("Text");
 						dos.writeUTF(lbReceiver.getText());
 						dos.writeUTF(txtMessage.getText());
 						dos.flush();
@@ -409,17 +404,12 @@ public class ChatFrame extends JFrame {
 		contentPane.add(chatPanel);
 
 		this.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
-
 				try {
-					dos.writeUTF("Log out");
 					dos.flush();
 
-					try {
-						receiver.join();
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
+					receiver.join();
 
 					if (dos != null) {
 						dos.close();
@@ -427,7 +417,7 @@ public class ChatFrame extends JFrame {
 					if (dis != null) {
 						dis.close();
 					}
-				} catch (IOException e1) {
+				} catch (IOException | InterruptedException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -451,14 +441,14 @@ public class ChatFrame extends JFrame {
 
 					String method = dis.readUTF();
 
-					if (method.equals("Text")) {
+					if (!method.equals("Online users")) {
 
 						String sender = dis.readUTF();
 						String message = dis.readUTF();
 						newMessage(sender, message, false);
 					}
 
-					else if (method.equals("Online users")) {
+					else {
 
 						String[] users = dis.readUTF().split(",");
 						onlineUsers.removeAllItems();
@@ -494,8 +484,6 @@ public class ChatFrame extends JFrame {
 						}
 
 						onlineUsers.validate();
-					} else if (method.equals("Safe to leave")) {
-						break;
 					}
 
 				}
@@ -514,18 +502,4 @@ public class ChatFrame extends JFrame {
 		}
 	}
 
-	private class SwingAction extends AbstractAction {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public SwingAction() {
-			putValue(NAME, "SwingAction");
-			putValue(SHORT_DESCRIPTION, "Some short description");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-		}
-	}
 }

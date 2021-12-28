@@ -21,14 +21,15 @@ import javax.net.ssl.SSLServerSocketFactory;
  */
 public class Server {
 	private Object lock;
-	
+	private final String SECRET = "234rf2d2%TT4";
+
 	private SSLServerSocket s;
 	private Socket socket;
-	static ArrayList<Handler> clients = new ArrayList<Handler>();
+	static ArrayList<AccountManagement> clients = new ArrayList<AccountManagement>();
 	private String dataFile = "accounts.txt";
 	private static final String KEY_STORE_PATH = "SSLStore";
 	private static final String KEY_STORE_PW = "123456";
-	
+
 	static {
 		System.setProperty("javax.net.ssl.keyStore", KEY_STORE_PATH);
 		System.setProperty("javax.net.ssl.keyStorePassword", KEY_STORE_PW);
@@ -37,29 +38,28 @@ public class Server {
 	private void loadAccounts() {
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), "utf8"));
-			
+
 			String info = br.readLine();
 			while (info != null && !(info.isEmpty())) {
-				clients.add(new Handler(info.split(",")[0], info.split(",")[1], false, lock));
+				clients.add(new AccountManagement(info.split(",")[0], info.split(",")[1], false, lock));
 				info = br.readLine();
 			}
-			
+
 			br.close();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
 
 	private void saveAccounts() {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(new File(dataFile), "utf8");
-		} catch (Exception ex ) {
+		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}
-		for (Handler client : clients) {
+		for (AccountManagement client : clients) {
 			pw.print(client.getUsername() + "," + client.getPassword() + "\n");
 		}
 		pw.println("");
@@ -67,69 +67,70 @@ public class Server {
 			pw.close();
 		}
 	}
-	
+
 	public Server(int port) throws IOException {
 		try {
 			lock = new Object();
-			
+
 			this.loadAccounts();
 			SSLServerSocketFactory socketServerFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			s = (SSLServerSocket) socketServerFactory.createServerSocket(port);
-			
-//			s = new ServerSocket(port);
-			
-			while (true) {				
+
+			// s = new ServerSocket(port);
+
+			while (true) {
 				socket = s.accept();
-				
+
 				DataInputStream dis = new DataInputStream(socket.getInputStream());
 				DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-								
+
 				String request = dis.readUTF();
-				
+
 				if (request.equals("Sign up")) {
-					
+
 					String username = dis.readUTF();
-					String password = dis.readUTF();					
-					
+					String password = dis.readUTF();
+
 					if (isExisted(username) == false) {
 
-						Handler newHandler = new Handler(socket, username, password, true, lock);
-						clients.add(newHandler);
-						
+						AccountManagement newAccountManagement = new AccountManagement(socket, username, password, true,
+								lock);
+						clients.add(newAccountManagement);
+
 						this.saveAccounts();
 						dos.writeUTF("Sign up successful");
 						dos.flush();
-						
-						Thread t = new Thread(newHandler);
+
+						Thread t = new Thread(newAccountManagement);
 						t.start();
-						
+
 						updateOnlineUsers();
 					} else {
-						
+
 						dos.writeUTF("This username is being used");
 						dos.flush();
 					}
 				} else if (request.equals("Log in")) {
-					
+
 					String username = dis.readUTF();
 					String password = dis.readUTF();
-					
+
 					if (isExisted(username) == true) {
-						for (Handler client : clients) {
+						for (AccountManagement client : clients) {
 							if (client.getUsername().equals(username)) {
-							
-								if (password.equals(client.getPassword())) {					
-									
-									Handler newHandler = client;
-									newHandler.setSocket(socket);
-									newHandler.setIsLoggedIn(true);
-								
+
+								if (password.equals(client.getPassword())) {
+
+									AccountManagement newAccountManagement = client;
+									newAccountManagement.setSocket(socket);
+									newAccountManagement.setIsLoggedIn(true);
+
 									dos.writeUTF("Log in successful");
 									dos.flush();
-									
-									Thread t = new Thread(newHandler);
+
+									Thread t = new Thread(newAccountManagement);
 									t.start();
-									
+
 									updateOnlineUsers();
 								} else {
 									dos.writeUTF("Password is not correct");
@@ -138,16 +139,16 @@ public class Server {
 								break;
 							}
 						}
-						
+
 					} else {
 						dos.writeUTF("This username is not exist");
 						dos.flush();
 					}
 				}
-				
+
 			}
-			
-		} catch (Exception ex){
+
+		} catch (Exception ex) {
 			System.err.println(ex);
 		} finally {
 			if (s != null) {
@@ -155,28 +156,26 @@ public class Server {
 			}
 		}
 	}
-	
 
 	public boolean isExisted(String name) {
-		for (Handler client:clients) {
+		for (AccountManagement client : clients) {
 			if (client.getUsername().equals(name)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
 
 	public static void updateOnlineUsers() {
 		String message = " ";
-		for (Handler client:clients) {
+		for (AccountManagement client : clients) {
 			if (client.getIsLoggedIn() == true) {
 				message += ",";
 				message += client.getUsername();
 			}
 		}
-		for (Handler client:clients) {
-			if (client.getIsLoggedIn() == true) {
+		for (AccountManagement client : clients) {
+			if (client.getIsLoggedIn()) {
 				try {
 					client.getDos().writeUTF("Online users");
 					client.getDos().writeUTF(message);
@@ -187,22 +186,22 @@ public class Server {
 			}
 		}
 	}
-	
+
 }
 
+class AccountManagement implements Runnable {
 
-class Handler implements Runnable{
-	
 	private Object lock;
-	
+	private final String SECRET = "234rf2d2%TT4";
 	private Socket socket;
 	private DataInputStream dis;
 	private DataOutputStream dos;
 	private String username;
 	private String password;
 	private boolean isLoggedIn;
-	
-	public Handler(Socket socket, String username, String password, boolean isLoggedIn, Object lock) throws IOException {
+
+	public AccountManagement(Socket socket, String username, String password, boolean isLoggedIn, Object lock)
+			throws IOException {
 		this.socket = socket;
 		this.username = username;
 		this.password = password;
@@ -211,18 +210,18 @@ class Handler implements Runnable{
 		this.isLoggedIn = isLoggedIn;
 		this.lock = lock;
 	}
-	
-	public Handler(String username, String password, boolean isLoggedIn, Object lock) {
+
+	public AccountManagement(String username, String password, boolean isLoggedIn, Object lock) {
 		this.username = username;
 		this.password = password;
 		this.isLoggedIn = isLoggedIn;
 		this.lock = lock;
 	}
-	
+
 	public void setIsLoggedIn(boolean IsLoggedIn) {
 		this.isLoggedIn = IsLoggedIn;
 	}
-	
+
 	public void setSocket(Socket socket) {
 		this.socket = socket;
 		try {
@@ -232,8 +231,7 @@ class Handler implements Runnable{
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void closeSocket() {
 		if (socket != null) {
 			try {
@@ -243,83 +241,50 @@ class Handler implements Runnable{
 			}
 		}
 	}
-	
+
 	public boolean getIsLoggedIn() {
 		return this.isLoggedIn;
 	}
-	
+
 	public String getUsername() {
 		return this.username;
 	}
-	
+
 	public String getPassword() {
 		return this.password;
 	}
-	
+
 	public DataOutputStream getDos() {
 		return this.dos;
 	}
-	
+
 	@Override
 	public void run() {
-		
+
 		while (true) {
 			try {
 				String message = null;
-				
+
 				message = dis.readUTF();
-				
-				if (message.equals("Log out")) {
-					
-					dos.writeUTF("Safe to leave");
-					dos.flush();
-					
-					socket.close();
-					this.isLoggedIn = false;
-					
-					Server.updateOnlineUsers();
-					break;
-				}
-				
-				else if (message.equals("Text")){
-					String receiver = dis.readUTF();
-					String content = dis.readUTF();
-					
-					for (Handler client: Server.clients) {
-						if (client.getUsername().equals(receiver)) {
-							synchronized (lock) {
-								client.getDos().writeUTF("Text");
-								client.getDos().writeUTF(this.username);
-								client.getDos().writeUTF(content);
-								client.getDos().flush();
-								break;
-							}
+
+				String receiver = dis.readUTF();
+				String content = dis.readUTF();
+
+				for (AccountManagement client : Server.clients) {
+					if (client.getUsername().equals(receiver)) {
+						synchronized (lock) {
+							client.getDos().writeUTF(this.username);
+							client.getDos().writeUTF(content);
+							client.getDos().flush();
+							break;
 						}
 					}
 				}
-				
-				else if (message.equals("Emoji")) {
-					String receiver = dis.readUTF();
-					String emoji = dis.readUTF();
-					
-					for (Handler client: Server.clients) {
-						if (client.getUsername().equals(receiver)) {
-							synchronized (lock) {
-								client.getDos().writeUTF("Emoji");
-								client.getDos().writeUTF(this.username);
-								client.getDos().writeUTF(emoji);
-								client.getDos().flush();
-								break;
-							}
-						}
-					}
-				}
-				
-				
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
 }
